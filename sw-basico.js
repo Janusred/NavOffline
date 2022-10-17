@@ -45,3 +45,23 @@ self.addEventListener('fetch', event => {
     event.respondWith( resp  );
 
 });
+
+ self.addEventListener('fetch',e=>{
+      //   2- Cache with Network Fallback
+      const respuesta = caches.match( e.request )
+      .then( res => {
+
+          if ( res ) return res;
+
+           return fetch( e.request ).then( newResp => {
+
+              caches.open( CACHE_DYNAMIC_NAME )
+                  .then( cache => {
+                      cache.put( e.request, newResp );
+                      limpiarCache( CACHE_DYNAMIC_NAME, 50 );
+                  });
+
+              return newResp.clone();
+         });
+     });
+ });
